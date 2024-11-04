@@ -29,6 +29,7 @@ def get_books_in_library(library_name):
 # Retrieve the librarian for a library
 def get_librarian_for_library(library_name):
     try:
+        libra = objects.filter(author=author)             #null
         library = Library.objects.get(name=library_name)
         librarian = library.librarian
         print(f"Librarian for {library.name}: {librarian.name}")
