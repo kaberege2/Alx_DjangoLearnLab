@@ -9,9 +9,14 @@ urlpatterns = [
     path('books/', views.book_list, name='books'),
     path('booklist/', list_books, name='bookslist'),
     path('library/<int:pk>/', views.LibraryDetailView.as_view(), name='library'),
-    path('accounts/', include('django.contrib.auth.urls')),
+    #path('accounts/', include('django.contrib.auth.urls')),    default
+     # Login view
+    path('login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
+    # Logout view
+    path('logout/', LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
     path('accounts/profile/',
              TemplateView.as_view(template_name='accounts/profile.html'),
              name='profile'),
     path("signup/", views.SignUpView.as_view(), name="signup"),
+    path('register/', views.register, name='register'),            #null
 ]

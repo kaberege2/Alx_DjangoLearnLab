@@ -53,3 +53,15 @@ class SignUpView(CreateView):
 
         # Redirect to profile page (or any page you prefer)
         return redirect(self.success_url)
+
+#Null
+# Register view
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
