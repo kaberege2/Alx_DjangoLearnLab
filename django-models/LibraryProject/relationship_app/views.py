@@ -70,14 +70,12 @@ def register(request):
 
 #Create Role-Based Views: Define views for different roles using the @user_passes_test decorator
 # Custom function to check the user's role
+# Custom function to check the user's role
 def check_role(role):
     def decorator(user):
-        return user.userprofile.role == role
+        # Ensure the user has a userprofile and check their role
+        return user.userprofile.role == role if hasattr(user, 'userprofile') else False
     return decorator
-    '''
-def check_role(role):
-    return lambda u: u.userprofile.role == role
-'''
 
 @user_passes_test(check_role('Admin'))
 def Admin(request):
