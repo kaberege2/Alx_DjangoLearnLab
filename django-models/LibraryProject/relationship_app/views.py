@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 
 def hello_view(request):
     """A basic function view returning a greeting message."""
@@ -71,20 +72,25 @@ def register(request):
 #Create Role-Based Views: Define views for different roles using the @user_passes_test decorator
 # Custom function to check the user's role
 # Custom function to check the user's role
+#For clarity and to avoid potential confusion or conflicts, 
+#I recommend using descriptive view function names such as admin_view, librarian_view, and member_view
 def check_role(role):
     def decorator(user):
         # Ensure the user has a userprofile and check their role
         return user.userprofile.role == role if hasattr(user, 'userprofile') else False
     return decorator
 
+@login_required
 @user_passes_test(check_role('Admin'))
 def Admin(request):
     return render(request, 'admin_view.html')
 
+@login_required
 @user_passes_test(check_role('Librarian'))
 def Librarian(request):
     return render(request, 'librarian_view.html')
 
+@login_required
 @user_passes_test(check_role('Member'))
 def Member(request):
     return render(request, 'member_view.html')
