@@ -11,6 +11,7 @@ from relationship_app.models import Author, Book, Library, Librarian
 # Query all books by a specific author
 def get_books_by_author(author_name):
     try:
+        objects.filter(author=author)       #To be verified
         author = Author.objects.get(name=author_name)
         books = author.books.all()
         print(f"Books by {author.name}: {[book.title for book in books]}")
