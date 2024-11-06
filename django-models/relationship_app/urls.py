@@ -19,7 +19,7 @@ urlpatterns = [
              name='profile'),
     path("signup/", views.SignUpView.as_view(), name="signup"),
     path('register/', views.register, name='register'),            #null
-    path('admin-view/', views.admin_view, name='admin_view'),
-    path('librarian-view/', views.librarian_view, name='librarian_view'),
-    path('member-view/', views.member_view, name='member_view'),
+    path('admin-view/', views.Admin, name='admin_view'),
+    path('librarian-view/', views.Librarian, name='librarian_view'),
+    path('member-view/', views.Member, name='member_view'),
 ]
