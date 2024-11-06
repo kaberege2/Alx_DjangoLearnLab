@@ -10,6 +10,9 @@ from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import BookForm  # Assuming you have a BookForm for handling book creation and editing
 
 def hello_view(request):
     """A basic function view returning a greeting message."""
@@ -94,3 +97,38 @@ def Librarian(request):
 @user_passes_test(check_role('Member'))
 def Member(request):
     return render(request, 'member_view.html')
+
+
+# Add a new book (requires 'can_add_book' permission)
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')  # Redirect to the list of books after adding
+    else:
+        form = BookForm()
+    return render(request, 'add_book.html', {'form': form})
+
+# Edit an existing book (requires 'can_change_book' permission)
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')  # Redirect after editing
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'edit_book.html', {'form': form, 'book': book})
+
+# Delete a book (requires 'can_delete_book' permission)
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('list_books')  # Redirect after deletion
+    return render(request, 'confirm_delete.html', {'book': book})
