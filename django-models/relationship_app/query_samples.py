@@ -22,6 +22,7 @@ def get_books_by_author(author_name):
 def get_books_in_library(library_name):
     try:
         library = Library.objects.get(name=library_name)
+        libra = Librarian.objects.get(library= library_name)   #To be verified
         books = library.books.all()
         print(f"Books in {library.name}: {[book.title for book in books]}")
     except Library.DoesNotExist:

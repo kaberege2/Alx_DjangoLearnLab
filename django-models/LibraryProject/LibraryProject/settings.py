@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookshelf',
-    'relationship_app',
+   # 'relationship_app',
+    'relationship_app.apps.RelationshipAppConfig', #If you have a ready() method in apps.py (as you're doing with your signal registration), you must use the full path 'relationship_app.apps.RelationshipAppConfig'
 ]
 
 MIDDLEWARE = [
