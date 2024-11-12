@@ -6,6 +6,7 @@ from django.conf import settings
 
 # Create your models here.
  ["class CustomUser(AbstractUser):", "date_of_birth", "profile_photo"]
+ ["class CustomUserManager(BaseUserManager):"]
 
 class BookModel(models.Model):
     title = models.CharField(max_length=200)
