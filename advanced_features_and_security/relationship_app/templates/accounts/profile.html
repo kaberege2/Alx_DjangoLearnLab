@@ -1,0 +1,28 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+
+<body>
+    {% if user.is_authenticated %} You are logged in as {{ user }}.
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+    {% else %} You are not logged in.
+    <a href="{% url 'login' %}">Click here to log in.</a>
+    {% endif %}
+    <p>=========================================</p>
+    <h1>Register</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+</body>
+
+</html>
