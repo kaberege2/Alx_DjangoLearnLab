@@ -7,21 +7,17 @@ from django.conf import settings
  ["class CustomUser(AbstractUser):", "date_of_birth", "profile_photo"]
  ["class CustomUserManager(BaseUserManager):"]
 
-class BookModel(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
-    publication_year = models.IntegerField()
 
-
-class Authore(models.Model):
+class Author(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
-class Books(models.Model):
+class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.ForeignKey(Authore, on_delete=models.CASCADE, related_name='books')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
+    publication_year = models.IntegerField()
     
     class Meta:
         permissions = [
@@ -39,19 +35,19 @@ class Books(models.Model):
 
 class Librarys(models.Model):
     name = models.CharField(max_length=100)
-    books = models.ManyToManyField(Books, related_name='libraries')
+    books = models.ManyToManyField(Book, related_name='libraries')
 
     def __str__(self):
         return self.name
 
-class Librarians(models.Model):
+class Librarian(models.Model):
     name = models.CharField(max_length=100)
-    library = models.OneToOneField(Librarys, on_delete=models.CASCADE, related_name='librarian')
+    library = models.OneToOneField(Library, on_delete=models.CASCADE, related_name='librarian')
 
     def __str__(self):
         return self.name
 
-class CustomUsers(AbstractUser):
+class CustomUser(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
 
