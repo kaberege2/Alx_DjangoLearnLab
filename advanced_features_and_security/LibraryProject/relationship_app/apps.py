@@ -7,3 +7,4 @@ class RelationshipAppConfig(AppConfig):
 
     def ready(self):
         import relationship_app.signals  # Import signals when the app is ready
+

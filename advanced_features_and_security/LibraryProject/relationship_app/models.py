@@ -19,6 +19,10 @@ class Book(models.Model):
             ('can_add_book', 'Can add book'),
             ('can_change_book', 'Can change book'),
             ('can_delete_book', 'Can delete book'),
+            ('can_view', 'Can view book'),  #Add custom permissions to your models. You could add can_view, can_create, can_edit, can_delete to models like Book
+            ('can_create', 'Can create book'),
+            ('can_edit', 'Can edit book'),
+            ('can_delete', 'Can delete book'),
         ]
 
     def __str__(self):

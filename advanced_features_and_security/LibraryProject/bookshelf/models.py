@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
 from django.conf import settings
-
 # Create your models here.
  ["class CustomUser(AbstractUser):", "date_of_birth", "profile_photo"]
  ["class CustomUserManager(BaseUserManager):"]
@@ -29,6 +28,10 @@ class Books(models.Model):
             ('can_add_book', 'Can add book'),
             ('can_change_book', 'Can change book'),
             ('can_delete_book', 'Can delete book'),
+            ('can_view', 'Can view book'),
+            ('can_create', 'Can create book'),
+            ('can_edit', 'Can edit book'),
+            ('can_delete', 'Can delete book'),
         ]
 
     def __str__(self):
