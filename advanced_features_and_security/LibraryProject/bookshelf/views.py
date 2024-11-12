@@ -14,3 +14,5 @@ def edit_book(request, pk):
     else:
         form = BookForm(instance=book)
     return render(request, 'edit_book.html', {'form': form})
+    
+["book_list"]
