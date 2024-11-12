@@ -3,6 +3,7 @@ from .model import Book
 
 # Create your views here.
 from django.contrib.auth.decorators import permission_required
+from .forms import ExampleForm
 
 def book_list(request):
       """Retrieves all books and renders a template displaying the list."""
