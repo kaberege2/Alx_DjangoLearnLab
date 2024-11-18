@@ -13,7 +13,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import BookForm  # Assuming you have a BookForm for handling book creation and editing
-from .forms import ExampleForm
 
 def hello_view(request):
     """A basic function view returning a greeting message."""
