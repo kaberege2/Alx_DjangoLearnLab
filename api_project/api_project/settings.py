@@ -127,7 +127,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #This tells DRF to use token-based authentication for all API views by default.
 REST_FRAMEWORK = {
+    # Authentication settings (ensure token authentication is enabled)
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # <-- Add this line
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    
+    # Permission settings
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # <-- Add this line
     ],
 }
