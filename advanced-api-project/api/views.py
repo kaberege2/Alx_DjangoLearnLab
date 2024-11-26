@@ -1,35 +1,50 @@
 from django.shortcuts import render
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import BookSerializer, AuthorSerializer
 from .models import Book, Author
 
     #For retrieving all books.
-class ListView(generics.ListAPIView):
+class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  # Read-only for unauthenticated users
+
+    # Enable Filtering, Searching, and Ordering
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     
-    #For retrieving a single book by ID.
-class DetailView(generics.RetrieveAPIView):
+    # Define the filter fields
+    filterset_fields = ['title', 'author', 'publication_year']
+    
+    # Search fields
+    search_fields = ['title', 'author']
+    
+    # Order by fields
+    ordering_fields = ['title', 'publication_year']
+    ordering = ['title']  # Default ordering by title
+    
+     #For retrieving a single book by ID.
+class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]   # Read-only for unauthenticated users
 
     #For adding a new book.
-class CreateView(generics.CreateAPIView):
+class BookCreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create books
 
      #For modifying an existing book.
-class UpdateView(generics.UpdateAPIView):
+class BookUpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated,IsAdminUser]  # Ensure only authenticated users can create books
 
      #For removing a book.
-class DeleteView(generics.DestroyAPIView):
+class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated,IsAdminUser] # Ensure only authenticated users can create books
