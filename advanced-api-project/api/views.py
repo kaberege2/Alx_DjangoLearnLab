@@ -32,7 +32,7 @@ class UpdateView(generics.UpdateAPIView):
 class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create books
+    permission_classes = [IsAuthenticated,IsAdminUser] # Ensure only authenticated users can create books
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
