@@ -5,8 +5,9 @@ from . import views
 
 
 urlpatterns = [
-    path("home", views.my_test, name ="home"),
-    path("posts", views.my_test, name ="posts"),
+    path("home", views.home, name ="home"),
+    path("posts", views.user_posts, name ="posts"),
+    path('user/<int:user_id>/posts/', views.user_posts_details, name='user_posts_details'),
     # Login view url path
     path('login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
 

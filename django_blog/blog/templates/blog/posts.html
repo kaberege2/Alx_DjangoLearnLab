@@ -1,0 +1,18 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blg Posts{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %} Hello {{user}} All Blog Posts Are:
+<p><a href="{% url 'user_posts_details' user.id %}">View your posts</a></p>
+{% for post in posts %}
+<h2>{{post.title}}</h2>
+<p>{{post.content}}</p>
+<p>{{post.published_date}}</p>
+<p>{{post.author}}</p>
+<p><a href="{% url 'user_posts_details' post.id %}">View post details</a></p>
+{% endfor %}
+{% else %}Log in to view posts.
+<a href="{% url 'login' %}">Click here to log in.</a>
+{% endif %}
+{% endblock %}

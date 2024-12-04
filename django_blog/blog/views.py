@@ -1,14 +1,33 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.http import HttpResponse
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from .models import Post
+from django.contrib.auth.models import User
 
 # Create your views here.
 
-def my_test(request):
-    return HttpResponse("Hello world")
+def home(request):
+    return render(request, 'blog/home.html')
+
+def user_posts(request):
+    posts = Post.objects.all()
+    context={"posts": posts}
+    #return HttpResponse("Hello world")
+    return render(request, 'blog/posts.html', context)
+
+def user_posts_details(request, user_id):
+    # Get the user by ID or return a 404 if not found
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get the posts associated with that user
+    posts = Post.objects.filter(author=user)
+    context = {"user": user, "posts": posts}
+    
+    # Render the posts to a template
+    return render(request, 'blog/posts_details.html', context)
 
 # Register view
 def register(request):
