@@ -1,0 +1,13 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blg post_details{% endblock %}
+
+{% block content %}
+<!-- blog/templates/blog/post_form.html -->
+<h2>Edit Post</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
