@@ -9,10 +9,10 @@ urlpatterns = [
     path("posts", views.user_posts, name ="posts"),
     path('user/<int:user_id>/posts/', views.user_posts_details, name='user_posts_details'),
     # Login view url path
-    path('login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('login/', LoginView.as_view(template_name='blog/login.html'), name='login'),
 
     # Logout view url path
-    path('logout/', LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
+    path('logout/', LogoutView.as_view(template_name='blog/logout.html'), name='logout'),
 
     path('accounts/profile/',
              TemplateView.as_view(template_name='accounts/profile.html'),

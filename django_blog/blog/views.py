@@ -41,7 +41,7 @@ def register(request):
             return redirect('login')  # Redirect to the homepage/profile
     else:
         form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'blog/register.html', {'form': form})
 
 
 def profile(request):
