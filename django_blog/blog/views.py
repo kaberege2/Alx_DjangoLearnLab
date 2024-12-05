@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.http import HttpResponse
 from django.contrib.auth import login
 from django.contrib import messages
-from .forms import CustomUserCreationForm, PostForm
+from .forms import CustomUserCreationForm, PostForm, CommentForm
 from .models import Post
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -59,6 +59,7 @@ def profile(request):
         form = UserChangeForm(instance=request.user)
     return render(request, 'blog/profile.html', {'form': form})
 
+#---------------------Post views---------------------------
 
 # Post List View (List of all blog posts)
 class PostListView(ListView):
@@ -70,6 +71,12 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.all()  # Fetch related comments
+        return context
 
 # Post Create View (Create a new post)
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -109,3 +116,52 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         # Ensure that the logged-in user is the author of the post
         post = self.get_object()
         return post.author == self.request.user  # Only the author can delete the post
+
+#---------------------Comment views---------------------------
+
+# Post Create View (Create a new post)
+class AddCommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'add_comment.html'
+    context_object_name = 'comment'
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        form.instance.post = post  # Link the comment to the post
+        form.instance.author = self.request.user  # Set the logged-in user as the author
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.kwargs['post_id']})
+
+# Post Update View (Update an existing post)
+class EditCommentView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'edit_comment.html'
+    context_object_name = 'comment'
+
+    # Custom test to ensure the user is the author of the comment
+    def test_func(self):
+        comment = self.get_object()  # Get the current comment object
+        return comment.author == self.request.user  # Only allow if the logged-in user is the comment's author
+
+    def get_success_url(self):
+        # Redirect to the post's detail page after editing
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+
+# Post Delete View (Delete a post)
+class DeleteCommentView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'delete_comment.html'
+    context_object_name = 'comment'
+
+    # Custom test to ensure the user is the author of the comment
+    def test_func(self):
+        comment = self.get_object()  # Get the current comment object
+        return comment.author == self.request.user  # Only allow if the logged-in user is the comment's author
+
+    def get_success_url(self):
+        # Redirect to the post's detail page after deleting the comment
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
