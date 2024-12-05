@@ -1,4 +1,4 @@
-{% extends 'base_generic.html' %}
+{% extends 'blog/base.html' %}
 
 {% block title %}delete_comment.html{% endblock %}
 
@@ -9,5 +9,5 @@
     {% csrf_token %}
     <button type="submit">Delete Comment</button>
 </form>
-<a href="{% url 'post_detail' comment.post.pk %}">Cancel</a>
+<a href="{% url 'post_detail' comment.post.id %}">Cancel</a>
 {% endblock %}

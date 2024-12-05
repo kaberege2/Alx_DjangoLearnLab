@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import CustomUserCreationForm, PostForm, CommentForm
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -120,10 +120,10 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 #---------------------Comment views---------------------------
 
 # Post Create View (Create a new post)
-class AddCommentView(LoginRequiredMixin, CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'add_comment.html'
+    template_name = 'blog/add_comment.html'
     context_object_name = 'comment'
 
     def form_valid(self, form):
@@ -135,12 +135,23 @@ class AddCommentView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('post_detail', kwargs={'pk': self.kwargs['post_id']})
 
+    def get_context_data(self, **kwargs):
+        # Get the default context from the parent class
+        context = super().get_context_data(**kwargs)
+
+        # Fetch the post related to this comment using the post_id from the URL
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+
+        # Add the post object to the context so it's available in the template
+        context['post'] = post
+
+        return context
+
 # Post Update View (Update an existing post)
-class EditCommentView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'edit_comment.html'
-    context_object_name = 'comment'
+    template_name = 'blog/edit_comment.html'
 
     # Custom test to ensure the user is the author of the comment
     def test_func(self):
@@ -152,10 +163,9 @@ class EditCommentView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
 
 # Post Delete View (Delete a post)
-class DeleteCommentView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
-    template_name = 'delete_comment.html'
-    context_object_name = 'comment'
+    template_name = 'blog/delete_comment.html'
 
     # Custom test to ensure the user is the author of the comment
     def test_func(self):

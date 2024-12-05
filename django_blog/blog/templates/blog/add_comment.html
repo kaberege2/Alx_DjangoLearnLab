@@ -1,4 +1,4 @@
-{% extends 'base_generic.html' %}
+{% extends 'blog/base.html' %}
 
 {% block title %}add_comment.html{% endblock %}
 
@@ -9,5 +9,5 @@
     {{ form.as_p }}
     <button type="submit">Post Comment</button>
 </form>
-<a href="{% url 'post_detail' post.pk %}">Back to Post</a>
+<a href="{% url 'post_detail' pk=post.id %}">Back to Post</a>
 {% endblock %}

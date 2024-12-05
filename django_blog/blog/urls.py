@@ -2,7 +2,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path, include
 from django.views.generic import TemplateView
 from . import views
-from .views import PostListView, PostCreateView, PostUpdateView, PostDeleteView, PostDetailView CommentListView, CommentCreateView, CommentUpdateView, CommentDeleteView, CommentDetailView
+from .views import PostListView, PostCreateView, PostUpdateView, PostDeleteView, PostDetailView, CommentCreateView, CommentUpdateView, CommentDeleteView
 
 
 urlpatterns = [
@@ -27,9 +27,9 @@ urlpatterns = [
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post_edit'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
      # CRUD URLs for comments|Comment-related views
-    path('post/<int:post_id>/comment/', AddCommentView.as_view(), name='add_comment'),  # Add comment
-    path('comment/<int:pk>/edit/', EditCommentView.as_view(), name='edit_comment'),  # Edit comment
-    path('comment/<int:pk>/delete/', DeleteCommentView.as_view(), name='delete_comment'),  # Delete comment
+    path('post/<int:post_id>/comment/new', CommentCreateView.as_view(), name='add_comment'),  # Add comment
+    path('comment/<int:pk>/edit/', CommentUpdateView.as_view(), name='edit_comment'),  # Edit comment
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),  # Delete comment
 ]
 
 
