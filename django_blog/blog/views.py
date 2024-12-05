@@ -127,20 +127,20 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     context_object_name = 'comment'
 
     def form_valid(self, form):
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         form.instance.post = post  # Link the comment to the post
         form.instance.author = self.request.user  # Set the logged-in user as the author
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('post_detail', kwargs={'pk': self.kwargs['post_id']})
+        return reverse_lazy('post_detail', kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
         # Get the default context from the parent class
         context = super().get_context_data(**kwargs)
 
         # Fetch the post related to this comment using the post_id from the URL
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
 
         # Add the post object to the context so it's available in the template
         context['post'] = post
