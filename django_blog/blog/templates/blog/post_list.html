@@ -4,14 +4,18 @@
 
 {% block content %}
 {% if user.is_authenticated %} Hello {{user.username}} All Blog Posts Are:
+<form method="GET" action="{% url 'search' %}">
+    <input type="text" name="q" placeholder="Search posts..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
 <h2>All Blog Posts</h2>
 {% for post in posts %}
-    <div>
-        <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
-        <p>{{ post.content|truncatewords:20 }}</p>
-        <a href="{% url 'post_edit' post.pk %}">Edit</a> |
-        <a href="{% url 'post_delete' post.pk %}">Delete</a>
-    </div>
+<div>
+    <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+    <p>{{ post.content|truncatewords:20 }}</p>
+    <a href="{% url 'post_edit' post.pk %}">Edit</a> |
+    <a href="{% url 'post_delete' post.pk %}">Delete</a>
+</div>
 {% endfor %}
 <a href="{% url 'post_create' %}">Create New Post</a>
 {% else %}Log in to view posts.

@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Q
+from taggit.models import Tag
 
 # Create your views here.
 
@@ -71,7 +73,6 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
-    context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,7 +125,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'blog/add_comment.html'
-    context_object_name = 'comment'
 
     def form_valid(self, form):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
@@ -138,16 +138,13 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         # Get the default context from the parent class
         context = super().get_context_data(**kwargs)
-
         # Fetch the post related to this comment using the post_id from the URL
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
-
         # Add the post object to the context so it's available in the template
         context['post'] = post
-
         return context
 
-# Post Update View (Update an existing post)
+  # Post Update View (Update an existing post)
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
@@ -162,7 +159,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         # Redirect to the post's detail page after editing
         return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
 
-# Post Delete View (Delete a post)
+ # Post Delete View (Delete a post)
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'blog/delete_comment.html'
@@ -175,3 +172,23 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         # Redirect to the post's detail page after deleting the comment
         return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+
+# ----------------------------Seraching/Taging------------------------
+
+def search(request):
+    query = request.GET.get('q', '')
+    if query:
+        posts = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()  # Ensure unique results
+    else:
+        posts = Post.objects.all()  # If no query, return all posts
+
+    return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
+
+def post_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    posts = tag.posts.all()  # Get all posts with the specified tag
+    return render(request, 'blog/post_list.html', {'posts': posts, 'tag': tag_name})
