@@ -31,7 +31,8 @@ urlpatterns = [
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit_comment'),  # Edit comment
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),  # Delete comment
     path('search/', views.search, name='search'),
-    path('tags/<str:tag_name>/', views.post_by_tag, name='post_by_tag'),
+     # URL pattern for viewing posts by tag
+    path('tags/<slug:tag_slug>/', views.PostByTagListView.as_view(), name='posts_by_tag'),
 ]
 
 

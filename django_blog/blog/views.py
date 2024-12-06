@@ -192,3 +192,20 @@ def post_by_tag(request, tag_name):
     tag = Tag.objects.get(name=tag_name)
     posts = tag.posts.all()  # Get all posts with the specified tag
     return render(request, 'blog/post_list.html', {'posts': posts, 'tag': tag_name})
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list_by_tag.html'
+    context_object_name = 'posts'
+    
+    def get_queryset(self):
+        tag_slug = self.kwargs['tag_slug']
+        tag = Tag.objects.get(slug=tag_slug)  # Get the tag object by its slug
+        return Post.objects.filter(tags=tag)  # Filter posts that have this tag
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag_slug = self.kwargs['tag_slug']
+        tag = get_object_or_404(Tag, slug=tag_slug)  # Retrieve the tag object again
+        context['tag'] = tag  # Add the tag object to the context
+        return context
