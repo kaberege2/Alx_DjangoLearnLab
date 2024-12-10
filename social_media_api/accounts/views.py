@@ -11,9 +11,11 @@ class RegisterView(views.APIView):
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            # Create the user and the token
-            serializer.save()
-            return Response({'message': 'User registered successfully!'}, status=status.HTTP_201_CREATED)
+            user = serializer.save() # Create the user and the token
+            token = Token.objects.get(user=user)  # Get the token associated with the user
+            return Response({"token": token.key,'message': 'User registered successfully!','username': user.username,
+                'bio': user.bio,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # User login view
