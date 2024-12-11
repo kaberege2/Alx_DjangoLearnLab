@@ -5,8 +5,10 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from .serializers import RegistrationSerializer, LoginSerializer, UserProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
+from .models import CustomUser
 from posts.serializers import PostSerializer
 from posts.models import Post
 
@@ -86,22 +88,44 @@ class UnfollowUser(views.APIView):
     def post(self, request, user_id):
         user_to_unfollow = get_object_or_404(User, id=user_id)
         
+        # Prevent users from unfollowing themselves
+        if user_to_unfollow == request.user:
+            return Response({'detail': 'You cannot unfollow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Remove the user from the following list
         request.user.following.remove(user_to_unfollow)
+        
         return Response({'detail': 'User unfollowed successfully.'}, status=status.HTTP_200_OK)
 
 class PostPagination(PageNumberPagination):
     page_size = 10
 
-class UserFeed(generics.ListAPIView):
+class UserFeed(generics.GenericAPIView):
     """
     Get posts from the users that the current user follows.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = PostPagination
     serializer_class = PostSerializer
+    queryset = CustomUser.objects.all()  # Default queryset for all posts
 
     def get_queryset(self):
-        # Fetch posts from the users the current user follows
+        """
+        Return the posts from the users the current user follows.
+        """
         following_users = self.request.user.following.all()
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle the GET request and return paginated posts.
+        """
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
