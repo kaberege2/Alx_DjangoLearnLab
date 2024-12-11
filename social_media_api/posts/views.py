@@ -6,6 +6,7 @@ from rest_framework import generics, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 from django_filters import rest_framework
+from rest_framework.exceptions import PermissionDenied
 
 # Create your views here.
 
@@ -31,22 +32,22 @@ class PostViewSet(viewsets.ModelViewSet):
     filterset_fields = ['title', 'created_at']
     
     search_fields = ['title', 'content']
-    ordering_fields = ['title', 'created_at']
-    ordering = ['title']  # Default ordering by title
-    
+    ordering_fields = ['id', 'title', 'created_at']
+    ordering = ['id']  # Default ordering by title
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
         # Check if the user is the author before updating
         if self.get_object().author != self.request.user:
-            raise PermissionDenied("You can only update your own posts.")
+            raise PermissionDenied("You can only update your own posts!")
         serializer.save()
 
     def perform_destroy(self, instance):
         # Check if the user is the author before deleting
         if instance.author != self.request.user:
-            raise PermissionDenied("You can only delete your own posts.")
+            raise PermissionDenied("You can only delete your own posts!")
         instance.delete()
 
 class CommentViewset(viewsets.ModelViewSet):
@@ -60,8 +61,8 @@ class CommentViewset(viewsets.ModelViewSet):
     # Define the filter fields
     filterset_fields = ['content', 'created_at']
     search_fields = ['content']
-    ordering_fields = ['content', 'created_at']
-    ordering = ['content']  # Default ordering by title
+    ordering_fields = ['id', 'content', 'created_at']
+    ordering = ['id']  # Default ordering by title
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

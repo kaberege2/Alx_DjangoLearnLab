@@ -25,3 +25,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'bio', 'profile_picture']
+
+    def get_profile_picture(self, obj):
+        # Return URL or None if no profile picture exists
+        return obj.profile_picture.url if obj.profile_picture else None

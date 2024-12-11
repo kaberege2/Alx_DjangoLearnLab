@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LoginView, UserProfileView
+from .views import RegisterView, LoginView, UserProfileView, FollowUser, UnfollowUser, UserFeed
 from rest_framework.authtoken import views
 
 urlpatterns = [
@@ -7,4 +7,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),  # POST /api/accounts/login/
     path('profile/', UserProfileView.as_view(), name='profile'),  # GET /api/accounts/profile/
     path('api-token-auth/', views.obtain_auth_token),
+    path('follow/<int:user_id>/', FollowUser.as_view(), name='follow_user'),
+    path('unfollow/<int:user_id>/', UnfollowUser.as_view(), name='unfollow_user'),
+    path('feed/', UserFeed.as_view(), name='user_feed'),
 ]

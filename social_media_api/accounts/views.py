@@ -1,10 +1,16 @@
-from django.shortcuts import render
-from rest_framework import status, views
+from django.shortcuts import render, get_object_or_404
+from rest_framework import status, views, generics
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-from .serializers import RegistrationSerializer, LoginSerializer
+from .serializers import RegistrationSerializer, LoginSerializer, UserProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from django.contrib.auth import get_user_model
+from posts.serializers import PostSerializer
+from posts.models import Post
+
+User = get_user_model()  # Custom user model
 
 # User registration view
 class RegisterView(views.APIView):
@@ -31,7 +37,7 @@ class LoginView(views.APIView):
                 return Response({'token': token.key})
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+'''
 # User profile view (for authenticated users)
 class UserProfileView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -45,4 +51,57 @@ class UserProfileView(views.APIView):
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
         }
         return Response(data)
+'''
+class UserProfileView(views.APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)
+
+class FollowUser(views.APIView):
+    """
+    Follow a user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        user_to_follow = get_object_or_404(User, id=user_id)
+        
+        # Prevent users from following themselves
+        if user_to_follow == request.user:
+            return Response({'detail': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Add the user to the following list
+        request.user.following.add(user_to_follow)
+        return Response({'detail': 'User followed successfully.'}, status=status.HTTP_200_OK)
+
+class UnfollowUser(views.APIView):
+    """
+    Unfollow a user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        user_to_unfollow = get_object_or_404(User, id=user_id)
+        
+        # Remove the user from the following list
+        request.user.following.remove(user_to_unfollow)
+        return Response({'detail': 'User unfollowed successfully.'}, status=status.HTTP_200_OK)
+
+class PostPagination(PageNumberPagination):
+    page_size = 10
+
+class UserFeed(generics.ListAPIView):
+    """
+    Get posts from the users that the current user follows.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = PostPagination
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        # Fetch posts from the users the current user follows
+        following_users = self.request.user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
