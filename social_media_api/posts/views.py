@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Post, Comment
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import permissions
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework import generics, viewsets
 from rest_framework.pagination import PageNumberPagination
@@ -83,7 +84,7 @@ class UserFeed(generics.GenericAPIView):
     """
     Get posts from the users that the current user follows.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = PostPagination
     serializer_class = PostSerializer
     #queryset = CustomUser.objects.all()  # Default queryset for all posts
