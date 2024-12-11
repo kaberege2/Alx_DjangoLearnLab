@@ -78,3 +78,33 @@ class CommentViewset(viewsets.ModelViewSet):
         if instance.author != self.request.user:
             raise PermissionDenied("You can only delete your own posts.")
         instance.delete()
+
+class UserFeed(generics.GenericAPIView):
+    """
+    Get posts from the users that the current user follows.
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = PostPagination
+    serializer_class = PostSerializer
+    #queryset = CustomUser.objects.all()  # Default queryset for all posts
+
+    def get_queryset(self):
+        """
+        Return the posts from the users the current user follows.
+        """
+        following_users = self.request.user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle the GET request and return paginated posts.
+        """
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

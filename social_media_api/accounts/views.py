@@ -10,7 +10,6 @@ from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 from posts.serializers import PostSerializer
-from posts.models import Post
 
 User = get_user_model()  # Custom user model
 
@@ -79,15 +78,19 @@ class FollowUser(views.APIView):
         request.user.following.add(user_to_follow)
         return Response({'detail': 'User followed successfully.'}, status=status.HTTP_200_OK)
 
-class UnfollowUser(views.APIView):
+class UnfollowUser(generics.GenericAPIView):
     """
     Unfollow a user.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()  # Default queryset for all posts
 
-    def post(self, request, user_id):
+    def post(self, request, user_id, *args, **kwargs):
+        """
+        Handle unfollowing a user.
+        """
         user_to_unfollow = get_object_or_404(User, id=user_id)
-        
+
         # Prevent users from unfollowing themselves
         if user_to_unfollow == request.user:
             return Response({'detail': 'You cannot unfollow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -97,35 +100,3 @@ class UnfollowUser(views.APIView):
         
         return Response({'detail': 'User unfollowed successfully.'}, status=status.HTTP_200_OK)
 
-class PostPagination(PageNumberPagination):
-    page_size = 10
-
-class UserFeed(generics.GenericAPIView):
-    """
-    Get posts from the users that the current user follows.
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    pagination_class = PostPagination
-    serializer_class = PostSerializer
-    queryset = CustomUser.objects.all()  # Default queryset for all posts
-
-    def get_queryset(self):
-        """
-        Return the posts from the users the current user follows.
-        """
-        following_users = self.request.user.following.all()
-        return Post.objects.filter(author__in=following_users).order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        """
-        Handle the GET request and return paginated posts.
-        """
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
