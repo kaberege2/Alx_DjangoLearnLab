@@ -122,7 +122,7 @@ class LikePostView(views.APIView):
             return Response({'detail': 'You already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
         like = Like.objects.create(user=request.user, post=post)
         '''
-        post = generics.get_object_or_404(Post, id=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
 
          # Try to get the existing like, or create it if it doesn't exist
         like, created = Like.objects.get_or_create(user=request.user, post=post)
