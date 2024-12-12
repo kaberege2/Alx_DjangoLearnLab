@@ -11,6 +11,6 @@ urlpatterns = [
     path("comments_list/", CommentListView.as_view(), name="comments-generic-list"),
     path("", include(router.urls)),
     path('feed/', UserFeed.as_view(), name='user_feed'),
-    path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post'),
-    path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike_post'),
+    path('posts/<int:pk>/like/', LikePostView.as_view(), name='like_post'),
+    path('posts/<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike_post'),
 ]

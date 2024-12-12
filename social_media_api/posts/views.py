@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Post, Comment, Like
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .serializers import PostSerializer, CommentSerializer
@@ -116,26 +116,28 @@ class UserFeed(generics.GenericAPIView):
 class LikePostView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, post_id):
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            raise NotFound('Post not found.')
-
-        # Check if the user has already liked the post
+    def post(self, request, pk):
+        ''''  # Check if the user has already liked the post
         if Like.objects.filter(user=request.user, post=post).exists():
             return Response({'detail': 'You already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Create a like
         like = Like.objects.create(user=request.user, post=post)
+        '''
+        post = get_object_or_404(Post, id=pk)
 
-         # Create a notification for the post owner (author)
+         # Try to get the existing like, or create it if it doesn't exist
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            return Response({'detail': 'You already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a notification for the post owner (author)
         Notification.objects.create(
             recipient=post.author,  # The author of the post receives the notification
             actor=request.user,     # The user who liked the post
             verb='liked your post', # The action being performed (liking the post)
             target=post,            # The target of the action (the post itself)
-            #target_content_type=ContentType.objects.get_for_model(Post),  # The content type for the post model
+            target_content_type=ContentType.objects.get_for_model(Post),  # The content type for the post model
+            target_object_id=post.id,  # The ID of the post
         )
 
         return Response({'detail': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
@@ -143,12 +145,9 @@ class LikePostView(views.APIView):
 class UnlikePostView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, post_id):
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            raise NotFound('Post not found.')
-
+    def post(self, request, pk):
+        
+        post = get_object_or_404(Post, id=pk)
         # Check if the user has liked the post
         like = Like.objects.filter(user=request.user, post=post).first()
         if not like:
