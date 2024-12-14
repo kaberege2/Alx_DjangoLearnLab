@@ -90,8 +90,12 @@ WSGI_APPLICATION = 'social_media_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydb',  # This will be overwritten by Heroku's DATABASE_URL
+        'ENGINE': 'django.db.backends.postgresql',  # Specifies that you are using PostgreSQL
+        'NAME': 'blog',                         # The name of your PostgreSQL database (must match the database you created)
+        'USER': 'kgn',                             # The PostgreSQL user (must match the username you created)
+        'PASSWORD': 'kgn123',               # The password for the user (must match the password you created)
+        'HOST': 'localhost',                       # 'localhost' means the database is hosted on the same machine. Change it if it's on a different server.
+        'PORT': '5432',                            # Default PostgreSQL port
     }
 }
 
