@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 User = get_user_model()
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    # We do not expose the password in the serializer
+    # For not exposing the password in the serializer
     password = serializers.CharField(write_only=True)
 
     # Ensure the profile_picture is a file field
